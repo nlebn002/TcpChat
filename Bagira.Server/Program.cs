@@ -2,12 +2,13 @@
 using System.Net;
 using System.Collections.Concurrent;
 using System.Text;
+using Bagira.Shared;
 
-const int Port = 5000;
 var clients = new ConcurrentDictionary<string, StreamWriter>();
-var listener = new TcpListener(IPAddress.Loopback, Port);
+var listener = new TcpListener(IPAddress.Loopback, Utils.ServerPort);
+var letterDictionary = new Dictionary<char, int>();
 
-Console.WriteLine($"Chat server listening on port {Port}...");
+Console.WriteLine(Utils.FormatWithTimestamp($"Chat server listening on port {Utils.ServerPort}..."));
 listener.Start();
 
 while (true)
@@ -31,39 +32,41 @@ async Task HandleClientAsync(TcpClient client)
         clientName = await reader.ReadLineAsync();
         if (string.IsNullOrWhiteSpace(clientName))
         {
-            await writer.WriteLineAsync("Invalid name.");
+            await writer.WriteLineAsync(Utils.FormatWithTimestamp("Invalid name."));
             return;
         }
 
         if (!clients.TryAdd(clientName, writer))
         {
-            await writer.WriteLineAsync("Name already in use.");
+            await writer.WriteLineAsync(Utils.FormatWithTimestamp("Name already in use."));
             return;
         }
 
 
-        Console.WriteLine($"{clientName} connected.");
-        await BroadcastAsync($"{clientName} joined the chat", exclude: clientName);
+        Console.WriteLine(Utils.FormatWithTimestamp($"{clientName} connected."));
+        await SendMessage($"{clientName} joined the chat", exclude: clientName);
 
         string line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
             if (line.StartsWith("TO:", StringComparison.OrdinalIgnoreCase))
-                await RouteMessageAsync(clientName, line);
+                await SendPersonalMessage(clientName, line);
             else
-                await BroadcastAsync($"[{clientName}]: {line}", exclude: clientName);
+                await SendMessage($"[{clientName}]: {line}", exclude: clientName);
+
+            CountAndPrintLetterStats(line);
         }
     }
     catch
     {
-        Console.WriteLine($"{clientName ?? "Unknown"} disconnected with error.");
+        Console.WriteLine(Utils.FormatWithTimestamp($"{clientName ?? "Unknown"} disconnected with error."));
     }
     finally
     {
         if (clientName != null && clients.TryRemove(clientName, out _))
         {
-            Console.WriteLine($"{clientName} disconnected.");
-            await BroadcastAsync($"{clientName} left the chat", exclude: clientName);
+            Console.WriteLine(Utils.FormatWithTimestamp($"{clientName} disconnected."));
+            await SendMessage($"{clientName} left the chat", exclude: clientName);
         }
 
         client.Close();
@@ -71,30 +74,30 @@ async Task HandleClientAsync(TcpClient client)
 }
 
 
-async Task BroadcastAsync(string message, string exclude = null)
+async Task SendMessage(string message, string exclude = null)
 {
     foreach (var (name, writer) in clients)
     {
         if (name == exclude) continue;
         try
         {
-            await writer.WriteLineAsync(message);
+            await writer.WriteLineAsync(Utils.FormatWithTimestamp(message));
         }
         catch
         {
-            Console.WriteLine($"Failed to send to {name}");
+            Console.WriteLine(Utils.FormatWithTimestamp($"Failed to send to {name}"));
         }
     }
 }
 
-async Task RouteMessageAsync(string sender, string rawMessage)
+async Task SendPersonalMessage(string sender, string rawMessage)
 {
     // Format: TO:Bob|Hello there!
     var parts = rawMessage[3..].Split('-', 2, StringSplitOptions.TrimEntries);
     if (parts.Length != 2)
     {
         if (clients.TryGetValue(sender, out var senderWriter))
-            await senderWriter.WriteLineAsync("Invalid format. Use TO:Name-Message content");
+            await senderWriter.WriteLineAsync(Utils.FormatWithTimestamp("Invalid format. Use TO:Name-Message content"));
         return;
     }
 
@@ -103,10 +106,36 @@ async Task RouteMessageAsync(string sender, string rawMessage)
 
     if (clients.TryGetValue(recipient, out var recipientWriter))
     {
-        await recipientWriter.WriteLineAsync($"[Private from {sender}]: {message}");
+        await recipientWriter.WriteLineAsync(Utils.FormatWithTimestamp($"[Private from {sender}]: {message}"));
     }
     else if (clients.TryGetValue(sender, out var senderWriter))
     {
-        await senderWriter.WriteLineAsync($"User '{recipient}' not found.");
+        await senderWriter.WriteLineAsync(Utils.FormatWithTimestamp($"User '{recipient}' not found."));
     }
+}
+
+
+void CountAndPrintLetterStats(string message)
+{
+    CountLetters(message);
+    PrintLetterStats();
+}
+
+void CountLetters(string message)
+{
+    foreach (var ch in message.ToLower())
+    {
+        if (!char.IsLetter(ch)) continue;
+
+        if (!letterDictionary.ContainsKey(ch))
+            letterDictionary[ch] = 0;
+        letterDictionary[ch]++;
+    }
+}
+
+void PrintLetterStats()
+{
+    Console.WriteLine(Utils.FormatWithTimestamp("Letter counts:"));
+    foreach (var kvp in letterDictionary.OrderBy(k => k.Key))
+        Console.WriteLine($"{kvp.Key}: {kvp.Value}");
 }

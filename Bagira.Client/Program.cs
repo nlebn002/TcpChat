@@ -1,6 +1,7 @@
 ﻿
 using System.Net.Sockets;
 using System.Text;
+using Bagira.Shared;
 
 Console.Write("Please enter Name: ");
 string? userName = Console.ReadLine();
@@ -11,14 +12,11 @@ if (string.IsNullOrWhiteSpace(userName))
     return;
 }
 
-const string serverIp = "127.0.0.1";
-const int serverPort = 5000;
-
 try
 {
     using TcpClient client = new TcpClient();
-    await client.ConnectAsync(serverIp, serverPort);
-    Console.WriteLine($"Connected to chat server at {serverIp}:{serverPort}");
+    await client.ConnectAsync(Utils.ServerIP, Utils.ServerPort);
+    Console.WriteLine(Utils.FormatWithTimestamp($"Connected to chat server at {Utils.ServerIP}:{Utils.ServerPort}"));
 
     using NetworkStream stream = client.GetStream();
     using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -38,15 +36,15 @@ try
                 if (incoming != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("\n" + incoming);
+                    Console.WriteLine(incoming);
                     Console.ResetColor();
-                    Console.Write("> ");
+                    //Console.Write("> ");
                 }
             }
         }
         catch
         {
-            Console.WriteLine("Connection lost.");
+            Console.WriteLine(Utils.FormatWithTimestamp("Connection lost."));
         }
     });
 
@@ -58,10 +56,19 @@ try
     {
         if (!string.IsNullOrEmpty(input))
             await writer.WriteLineAsync(input);
-        Console.Write("> ");
+
+        int currentLineCursor = Console.CursorTop - 1;
+        Console.SetCursorPosition(0, currentLineCursor);
+        Console.Write(new string(' ', Console.WindowWidth));
+        Console.SetCursorPosition(0, currentLineCursor);
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(Utils.FormatWithTimestamp($"You: {input}", true));
+        Console.ResetColor();
+
+        //Console.Write("> ");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Failed to connect or communicate: {ex.Message}");
+    Console.WriteLine(Utils.FormatWithTimestamp($"Failed to connect or communicate: {ex.Message}", true));
 }
