@@ -1,5 +1,4 @@
 ﻿using Bagira.Shared;
-using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
@@ -7,6 +6,9 @@ using System.Text;
 
 namespace Bagira.Server;
 
+/// <summary>
+/// Straighforward MVP solution due to lack of time.
+/// </summary>
 internal class ChatServer
 {
     private ConcurrentDictionary<string, StreamWriter> Clients { get; } = new();
