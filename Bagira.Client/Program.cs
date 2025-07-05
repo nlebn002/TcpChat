@@ -36,9 +36,8 @@ try
                 if (incoming != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine(incoming);
+                    Console.WriteLine(Utils.FormatWithTimestamp(incoming, true));
                     Console.ResetColor();
-                    //Console.Write("> ");
                 }
             }
         }
@@ -50,8 +49,7 @@ try
 
     // Input loop: read user messages and send
     string? input;
-    Console.WriteLine("You can type messages or use TO:<Name>-<Message> for specific client.");
-    Console.Write("> ");
+    Console.WriteLine("IMPORTANT!!! You can type messages or use TO:<Name>-<Message> for specific client.");
     while ((input = Console.ReadLine()) != null)
     {
         if (!string.IsNullOrEmpty(input))
@@ -64,8 +62,6 @@ try
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(Utils.FormatWithTimestamp($"You: {input}", true));
         Console.ResetColor();
-
-        //Console.Write("> ");
     }
 }
 catch (Exception ex)

@@ -32,13 +32,13 @@ async Task HandleClientAsync(TcpClient client)
         clientName = await reader.ReadLineAsync();
         if (string.IsNullOrWhiteSpace(clientName))
         {
-            await writer.WriteLineAsync(Utils.FormatWithTimestamp("Invalid name."));
+            await writer.WriteLineAsync("Invalid name.");
             return;
         }
 
         if (!clients.TryAdd(clientName, writer))
         {
-            await writer.WriteLineAsync(Utils.FormatWithTimestamp("Name already in use."));
+            await writer.WriteLineAsync("Name already in use.");
             return;
         }
 
@@ -52,7 +52,7 @@ async Task HandleClientAsync(TcpClient client)
             if (line.StartsWith("TO:", StringComparison.OrdinalIgnoreCase))
                 await SendPersonalMessage(clientName, line);
             else
-                await SendMessage($"[{clientName}]: {line}", exclude: clientName);
+                await SendMessage($"{clientName}: {line}", exclude: clientName);
 
             CountAndPrintLetterStats(line);
         }
@@ -81,7 +81,7 @@ async Task SendMessage(string message, string exclude = null)
         if (name == exclude) continue;
         try
         {
-            await writer.WriteLineAsync(Utils.FormatWithTimestamp(message));
+            await writer.WriteLineAsync(message);
         }
         catch
         {
@@ -106,11 +106,11 @@ async Task SendPersonalMessage(string sender, string rawMessage)
 
     if (clients.TryGetValue(recipient, out var recipientWriter))
     {
-        await recipientWriter.WriteLineAsync(Utils.FormatWithTimestamp($"[Private from {sender}]: {message}"));
+        await recipientWriter.WriteLineAsync($"[Private from {sender}]: {message}");
     }
     else if (clients.TryGetValue(sender, out var senderWriter))
     {
-        await senderWriter.WriteLineAsync(Utils.FormatWithTimestamp($"User '{recipient}' not found."));
+        await senderWriter.WriteLineAsync($"User '{recipient}' not found.");
     }
 }
 
