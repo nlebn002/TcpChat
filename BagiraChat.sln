@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bagira.Server", "Bagira.Server\Bagira.Server.csproj", "{65ECC173-FFC6-4C38-B47A-E1C7904C4ED3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bagira.Client", "Bagira.Client\Bagira.Client.csproj", "{19EC8967-2541-45BF-8D9D-C43A38BB4278}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bagira.Shared", "Bagira.Shared\Bagira.Shared.csproj", "{FE5DF702-4D5D-4465-A891-4C9972293060}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65ECC173-FFC6-4C38-B47A-E1C7904C4ED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65ECC173-FFC6-4C38-B47A-E1C7904C4ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65ECC173-FFC6-4C38-B47A-E1C7904C4ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65ECC173-FFC6-4C38-B47A-E1C7904C4ED3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19EC8967-2541-45BF-8D9D-C43A38BB4278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19EC8967-2541-45BF-8D9D-C43A38BB4278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19EC8967-2541-45BF-8D9D-C43A38BB4278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19EC8967-2541-45BF-8D9D-C43A38BB4278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE5DF702-4D5D-4465-A891-4C9972293060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE5DF702-4D5D-4465-A891-4C9972293060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE5DF702-4D5D-4465-A891-4C9972293060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE5DF702-4D5D-4465-A891-4C9972293060}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
