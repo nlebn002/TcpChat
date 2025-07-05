@@ -6,7 +6,7 @@ using Bagira.Shared;
 
 var clients = new ConcurrentDictionary<string, StreamWriter>();
 var listener = new TcpListener(IPAddress.Loopback, Utils.ServerPort);
-var letterDictionary = new Dictionary<char, int>();
+var letterDictionary = new ConcurrentDictionary<char, int>();
 
 Console.WriteLine(Utils.FormatWithTimestamp($"Chat server listening on port {Utils.ServerPort}..."));
 listener.Start();
@@ -104,9 +104,12 @@ async Task SendPersonalMessage(string sender, string rawMessage)
     var recipient = parts[0];
     var message = parts[1];
 
+    if (recipient == sender)
+        return;
+
     if (clients.TryGetValue(recipient, out var recipientWriter))
     {
-        await recipientWriter.WriteLineAsync($"[Private from {sender}]: {message}");
+        await recipientWriter.WriteLineAsync($"Private from {sender}: {message}");
     }
     else if (clients.TryGetValue(sender, out var senderWriter))
     {
